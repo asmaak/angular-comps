@@ -1,0 +1,15 @@
+.close{
+  color:red !important;
+  top:0px !important;
+  right:0px !important;
+}
+/* empty any element with class actions and no child  */
+.actions:empty{
+ display:none;
+}
+.actions-default{
+  display: none;
+}
+.actions:empty+.actions-default{
+  display:block;
+}

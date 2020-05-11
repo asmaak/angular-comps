@@ -1,27 +1,145 @@
-# Comps
+-- to create project with routing
+1-ng new comps --routing
+<!-- ------------------------module----------------- -->
+2- ng generate module Module_name --routing
+  2-1 ng g m Elements --routing
+  2-2 ng g m Collections --routing
+  2-3 ng g m Views --routing
+  2-3 ng g m Mods --routing
+3- ng g c elements/ElementsHome
+4- add export at elements.module.ts
+@NgModule({
+  declarations: [ElementsHomeComponent],
+  imports: [
+    CommonModule,
+    ElementsRoutingModule
+  ],
+  exports: [ElementsHomeComponent]
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.4.
+})
+4- import ElementsModule at app.module.ts
+import {ElementsModule} from './elements/elements.module';
+ imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ElementsModule
 
-## Development server
+  ],
+<!-- ---------------------------routing----------------------- -->
+import { ElementsHomeComponent } from './elements-home/elements-home.component';
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+const routes: Routes = [
+  {path: 'elements' , component: ElementsHomeComponent}
+];
+<a routerLink="/elements">elements</a>
+<a routerLink="/collections">collections</a>
+<router-outlet></router-outlet>
+<!-- using style  semantic-ui-->
+https://semantic-ui.com/
+ npm i semantic-ui-css
+ @import 'semantic-ui-css/semantic.css';
+add menu
+<!-- create home component /create not-found component -->
+ng g c home
+ng g c not-found
+at app-routing-modules
+import { HomeComponent } from './home/home.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+const routes: Routes = [
+  {path: '',component: HomeComponent},
+  {path: '**', component: NotFoundComponent}
+];
+<!-- to fix error not-fount when clcik you can not go any component -->
+you must but AppRoutingModule at the last module
+imports: [
+    BrowserModule,
+    ElementsModule,
+    CollectionsModule,
+    AppRoutingModule
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+  ],
+  <!-- -------------------how implement lazy loading -->
+  1- you must detect the module you need to be lazy loading =>elements
+  2- you must rmove any import routing for this module 
+  at app.module.ts
+  import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+// import {ElementsModule} from './elements/elements.module';>lazy loading
+import { CollectionsModule } from './collections/collections.module';
+import { HomeComponent } from './home/home.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    NotFoundComponent
+  ],
+  imports: [
+    BrowserModule,
+    // ElementsModule,=>lazy loading
+    CollectionsModule,
+    AppRoutingModule
 
-## Build
+  ],
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+  3- at app-routing-module
+  
+const routes: Routes = [
+  {
+    path: 'elements' , loadChildren: () => import('./elements/elements.module').then((m) => m.ElementsModule)
+  },
+  {path: '', component: HomeComponent},
+  {path: '**', component: NotFoundComponent}
+];
 
-## Running unit tests
+4- edit path at module
+elements-routing-module
+const routes: Routes = [
+  {path: '' , component: ElementsHomeComponent}
+];
+<!-- -----------------create placeholder component -->
+ng g c elements/placeholder
+-- how can create directive to create this
+  <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+they all the same class
+-- ng g directive elements/times
+-- goal print out some numer of element some number of time
+import { Directive, TemplateRef, ViewContainerRef, Input } from '@angular/core';
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+import { Directive, TemplateRef, ViewContainerRef, Input } from '@angular/core';
 
-## Running end-to-end tests
+@Directive({
+  selector: '[appTimes]'
+})
+export class TimesDirective {
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+  constructor( private viewContainer: ViewContainerRef,
+               private templateRef: TemplateRef<any> ) { }
+  @Input('appTimes') set render(times: number){
+    this.viewContainer.clear();
+    // to empty out the current container
+    for (let i = 0 ; i < times ; i++){
+      this.viewContainer.createEmbeddedView(this.templateRef, {});
+    }
 
-## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+  }
+
+}
+  <div *appTimes="lines" class="line"></div>
+<!---------------------------------widget module-------------------  -->
+$ ng g module shared
+ng g c shared/Divider
+add it export shaed.module.ts
+-import at module to use it 
+<!-- deploy -->
+npm install -g angular-cli-ghpages 
+ ng build --prod --base-href https://asmaak.github.io/angular-card/ 
+ ngh --dir dist/card
